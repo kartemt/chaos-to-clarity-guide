@@ -10,6 +10,7 @@ import Day2 from "./pages/Day2";
 import Day3 from "./pages/Day3";
 import Day4 from "./pages/Day4";
 import Day5 from "./pages/Day5";
+import AdminApplications from "./pages/AdminApplications";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/day/3" element={<Day3 />} />
           <Route path="/day/4" element={<Day4 />} />
           <Route path="/day/5" element={<Day5 />} />
+          <Route path="/admin/applications" element={<AdminApplications />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

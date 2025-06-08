@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -239,6 +238,27 @@ const Index = () => {
           </div>
         )}
       </div>
+
+      {/* Footer with admin link */}
+      <footer className="border-t border-border/50 py-8 mt-16">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="text-center md:text-left mb-4 md:mb-0">
+              <p className="text-sm text-muted-foreground">
+                © 2025 Бизнес на автопилоте. Все права защищены.
+              </p>
+            </div>
+            <div className="text-center md:text-right">
+              <a 
+                href="/admin/applications" 
+                className="text-xs text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+              >
+                Управление
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
