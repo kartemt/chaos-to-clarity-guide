@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,33 +33,44 @@ const AdminApplications = () => {
   const { data: submissions = [], isLoading, refetch, error } = useQuery({
     queryKey: ['contact-submissions', searchTerm, dateFrom, dateTo, currentPage],
     queryFn: async () => {
+      console.log('🔍 Загружаем заявки с параметрами:', { searchTerm, dateFrom, dateTo, currentPage });
+      
       let query = supabase
         .from('contact_submissions')
         .select('*')
         .order('submitted_at', { ascending: false });
 
+      console.log('📊 Начальный запрос создан');
+
       if (searchTerm) {
+        console.log('🔎 Добавляем поиск по:', searchTerm);
         query = query.or(`first_name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%`);
       }
 
       if (dateFrom) {
+        console.log('📅 Фильтр от даты:', dateFrom);
         query = query.gte('submitted_at', dateFrom);
       }
 
       if (dateTo) {
+        console.log('📅 Фильтр до даты:', dateTo);
         query = query.lte('submitted_at', dateTo + 'T23:59:59');
       }
 
       const from = (currentPage - 1) * itemsPerPage;
       const to = from + itemsPerPage - 1;
+      console.log('📄 Пагинация: от', from, 'до', to);
 
       const { data, error } = await query.range(from, to);
 
+      console.log('📥 Результат запроса:', { data, error });
+
       if (error) {
-        console.error('Ошибка при загрузке заявок:', error);
+        console.error('❌ Ошибка при загрузке заявок:', error);
         throw new Error(error.message);
       }
 
+      console.log('✅ Загружено заявок:', data?.length || 0);
       return data as ContactSubmission[];
     },
   });
@@ -68,6 +78,8 @@ const AdminApplications = () => {
   const { data: totalCount = 0 } = useQuery({
     queryKey: ['contact-submissions-count', searchTerm, dateFrom, dateTo],
     queryFn: async () => {
+      console.log('🔢 Подсчитываем общее количество заявок');
+      
       let query = supabase
         .from('contact_submissions')
         .select('*', { count: 'exact', head: true });
@@ -86,17 +98,31 @@ const AdminApplications = () => {
 
       const { count, error } = await query;
 
+      console.log('📊 Результат подсчета:', { count, error });
+
       if (error) {
-        console.error('Ошибка при подсчете заявок:', error);
+        console.error('❌ Ошибка при подсчете заявок:', error);
         throw new Error(error.message);
       }
 
+      console.log('✅ Общее количество заявок:', count || 0);
       return count || 0;
     },
   });
 
+  // Добавляем логирование при изменении состояния
+  useEffect(() => {
+    console.log('🔄 Состояние изменилось:', {
+      isLoading,
+      error: error?.message,
+      submissionsCount: submissions.length,
+      totalCount
+    });
+  }, [isLoading, error, submissions, totalCount]);
+
   useEffect(() => {
     if (error) {
+      console.error('🚨 Обработка ошибки:', error);
       toast({
         title: "Ошибка загрузки",
         description: "Не удалось загрузить заявки. Проверьте подключение к интернету.",
@@ -108,6 +134,7 @@ const AdminApplications = () => {
   const totalPages = Math.ceil(totalCount / itemsPerPage);
 
   const handleRefresh = () => {
+    console.log('🔄 Обновление данных по кнопке');
     refetch();
     toast({
       title: "Обновлено",
@@ -117,6 +144,7 @@ const AdminApplications = () => {
 
   const handleExportToExcel = async () => {
     try {
+      console.log('📊 Начинаем экспорт в Excel');
       toast({
         title: "Подготовка экспорта...",
         description: "Загружаем все заявки для экспорта"
@@ -141,6 +169,8 @@ const AdminApplications = () => {
 
       const { data: allSubmissions, error } = await query;
 
+      console.log('📥 Данные для экспорта:', { allSubmissions, error });
+
       if (error) {
         throw new Error(error.message);
       }
@@ -155,6 +185,8 @@ const AdminApplications = () => {
         'Дата подачи': new Date(submission.submitted_at).toLocaleString('ru-RU')
       })) || [];
 
+      console.log('📋 Подготовленные данные для экспорта:', exportData);
+
       const ws = XLSX.utils.json_to_sheet(exportData);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Заявки");
@@ -162,13 +194,15 @@ const AdminApplications = () => {
       const fileName = `заявки_${new Date().toISOString().split('T')[0]}.xlsx`;
       XLSX.writeFile(wb, fileName);
 
+      console.log('✅ Экспорт завершен:', fileName);
+
       toast({
         title: "Экспорт завершен",
         description: `Файл ${fileName} успешно скачан`
       });
 
     } catch (error) {
-      console.error('Ошибка при экспорте:', error);
+      console.error('❌ Ошибка при экспорте:', error);
       toast({
         title: "Ошибка экспорта",
         description: "Не удалось экспортировать данные",
@@ -187,6 +221,13 @@ const AdminApplications = () => {
     });
   };
 
+  console.log('🎨 Рендер компонента AdminApplications:', {
+    isLoading,
+    submissionsLength: submissions.length,
+    totalCount,
+    error: error?.message
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted">
       <div className="container mx-auto px-4 py-8">
@@ -198,6 +239,13 @@ const AdminApplications = () => {
           <p className="text-lg text-muted-foreground">
             Управление заявками курса "Бизнес на автопилоте"
           </p>
+          {/* Добавляем отладочную информацию */}
+          <div className="mt-4 p-4 bg-yellow-100 rounded-lg text-sm">
+            <p><strong>Отладка:</strong> Загружается: {isLoading ? 'Да' : 'Нет'}</p>
+            <p><strong>Заявок загружено:</strong> {submissions.length}</p>
+            <p><strong>Общее количество:</strong> {totalCount}</p>
+            {error && <p className="text-red-600"><strong>Ошибка:</strong> {error.message}</p>}
+          </div>
         </div>
 
         {/* Stats */}
@@ -313,6 +361,9 @@ const AdminApplications = () => {
             ) : submissions.length === 0 ? (
               <div className="text-center py-8">
                 <p className="text-muted-foreground">Заявки не найдены</p>
+                <p className="text-sm text-gray-500 mt-2">
+                  Проверьте подключение к базе данных или попробуйте обновить страницу
+                </p>
               </div>
             ) : (
               <>
