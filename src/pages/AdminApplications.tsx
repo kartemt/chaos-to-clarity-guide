@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -239,13 +240,6 @@ const AdminApplications = () => {
           <p className="text-lg text-muted-foreground">
             Управление заявками курса "Бизнес на автопилоте"
           </p>
-          {/* Добавляем отладочную информацию */}
-          <div className="mt-4 p-4 bg-yellow-100 rounded-lg text-sm">
-            <p><strong>Отладка:</strong> Загружается: {isLoading ? 'Да' : 'Нет'}</p>
-            <p><strong>Заявок загружено:</strong> {submissions.length}</p>
-            <p><strong>Общее количество:</strong> {totalCount}</p>
-            {error && <p className="text-red-600"><strong>Ошибка:</strong> {error.message}</p>}
-          </div>
         </div>
 
         {/* Stats */}
