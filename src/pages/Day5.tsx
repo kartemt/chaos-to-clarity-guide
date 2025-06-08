@@ -1,5 +1,6 @@
 
 import CourseDay from "@/components/CourseDay";
+import ContactForm from "@/components/ContactForm";
 
 const Day5 = () => {
   const content = [
@@ -43,16 +44,19 @@ const Day5 = () => {
   ];
 
   return (
-    <CourseDay
-      day={5}
-      title="Дорожная карта развития"
-      description="План внедрения систем и стратегия развития бизнеса"
-      content={content}
-      tasks={tasks}
-      result="Стратегия системного развития бизнеса на ближайшие месяцы"
-      template="Дорожная карта развития.pdf"
-      prevDay={4}
-    />
+    <>
+      <CourseDay
+        day={5}
+        title="Дорожная карта развития"
+        description="План внедрения систем и стратегия развития бизнеса"
+        content={content}
+        tasks={tasks}
+        result="Стратегия системного развития бизнеса на ближайшие месяцы"
+        template="Дорожная карта развития.pdf"
+        prevDay={4}
+      />
+      <ContactForm />
+    </>
   );
 };
 
